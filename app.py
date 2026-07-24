@@ -18,7 +18,8 @@ w = np.array(model["weights"])
 b = model["bias"]
 gate = model["gate"]
 
-st.write(f"This perceptron was trained on the **{gate}** gate.")
+st.write(f"This perceptron was trained on the **{gate}** gate "
+         f"in only **{model['epochs_taken']} epochs**.")
 
 
 def sigmoid(z):
@@ -51,17 +52,16 @@ st.divider()
 # show how the model learned, epoch by epoch
 st.subheader("Training progress")
 
-# history was saved by train.py - one row every 100 epochs
+# history was saved by train.py - one row per epoch
 history = pd.DataFrame(model["history"])
 
-st.write("**How the weights and bias changed while training**")
+st.write("**Weights and bias after every epoch**")
+st.dataframe(history)
+st.caption("Training stops as soon as an epoch finishes with 0 mistakes.")
+
+st.write("**Same thing as a graph**")
 st.line_chart(history, x="epoch", y=["w1", "w2", "bias"])
-st.caption("Both weights climb up and the bias goes down, until the gate is learnt.")
 
-st.write("**How the error (loss) went down**")
-st.line_chart(history, x="epoch", y="loss")
-st.caption("Loss is how wrong the model is. It drops to almost 0, so training worked.")
-
-# the same data as a table, hidden by default to keep the page clean
-with st.expander("See the numbers as a table"):
-    st.dataframe(history)
+st.write("**Mistakes made in each epoch**")
+st.bar_chart(history, x="epoch", y="mistakes")
+st.caption("It reaches 0 mistakes, which means all 4 inputs are now predicted correctly.")
