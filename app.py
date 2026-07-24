@@ -5,6 +5,7 @@ takes two binary inputs from the user and shows the prediction.
 
 import json
 import numpy as np
+import pandas as pd
 import streamlit as st
 
 st.title("Binary Pattern Classifier")
@@ -44,3 +45,23 @@ st.write(f"Weight 1 (w1): {w[0]:.4f}")
 st.write(f"Weight 2 (w2): {w[1]:.4f}")
 st.write(f"Bias (b): {b:.4f}")
 st.caption(f"Formula used:  sigmoid({w[0]:.2f} * x1 + {w[1]:.2f} * x2 + {b:.2f})")
+
+st.divider()
+
+# show how the model learned, epoch by epoch
+st.subheader("Training progress")
+
+# history was saved by train.py - one row every 100 epochs
+history = pd.DataFrame(model["history"])
+
+st.write("**How the weights and bias changed while training**")
+st.line_chart(history, x="epoch", y=["w1", "w2", "bias"])
+st.caption("Both weights climb up and the bias goes down, until the gate is learnt.")
+
+st.write("**How the error (loss) went down**")
+st.line_chart(history, x="epoch", y="loss")
+st.caption("Loss is how wrong the model is. It drops to almost 0, so training worked.")
+
+# the same data as a table, hidden by default to keep the page clean
+with st.expander("See the numbers as a table"):
+    st.dataframe(history)

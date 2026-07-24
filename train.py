@@ -31,6 +31,8 @@ b = 0.0
 lr = 0.5        # learning rate - how big a step we take on every correction
 epochs = 5000   # how many times we go over the whole dataset
 
+history = []    # keeps a record of how the weights changed during training
+
 for epoch in range(epochs):
     for xi, target in zip(X, y):
         z = np.dot(w, xi) + b     # weighted sum of the inputs
@@ -41,13 +43,33 @@ for epoch in range(epochs):
         w += lr * error * xi
         b += lr * error
 
-    # print the progress once in a while just to see it learning
-    if epoch % 1000 == 0:
+    # take a snapshot every 100 epochs so we can plot the progress later
+    if epoch % 100 == 0:
         loss = np.mean((y - sigmoid(X @ w + b)) ** 2)
-        print(f"epoch {epoch:5d} | loss {loss:.4f}")
+        history.append({
+            "epoch": epoch,
+            "w1": float(w[0]),
+            "w2": float(w[1]),
+            "bias": float(b),
+            "loss": float(loss),
+        })
+
+        # print it once in a while just to see it learning
+        if epoch % 1000 == 0:
+            print(f"epoch {epoch:5d} | loss {loss:.4f}")
+
+# one last snapshot so the graph ends at the final trained values
+final_loss = np.mean((y - sigmoid(X @ w + b)) ** 2)
+history.append({
+    "epoch": epochs,
+    "w1": float(w[0]),
+    "w2": float(w[1]),
+    "bias": float(b),
+    "loss": float(final_loss),
+})
 
 # save the trained model so the streamlit app can just load it
-model = {"gate": GATE, "weights": w.tolist(), "bias": b}
+model = {"gate": GATE, "weights": w.tolist(), "bias": b, "history": history}
 with open("model.json", "w") as f:
     json.dump(model, f, indent=2)
 
